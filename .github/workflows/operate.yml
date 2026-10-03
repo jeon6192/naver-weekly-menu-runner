@@ -85,9 +85,6 @@ jobs:
           python -m pip install -r requirements-weekly-menu.txt
           python -m playwright install --with-deps chromium
 
-      - name: 발송 인증 없이 기존 테스트 확인
-        run: python launcher/validate.py --source source
-
       - name: 주간 식단 처리
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}

@@ -14,6 +14,10 @@ ERROR_CODES = {'CONFIG', 'STATE', 'COLLECTION', 'NUTRITION', 'RENDER', 'RUNTIME'
                'DEPENDENCIES', 'SUMMARY'}
 PREVIOUS_STATUSES = {'attempted', 'smtp_accepted', 'smtp_rejected', 'uncertain',
                      'failed_before_data'}
+NUTRITION_ERRORS = {'NETWORK', 'INCOMPLETE', 'JSON', 'REPEATED_MENU', 'MENU_COVERAGE',
+                    'MENU_ORDER', 'ENERGY', 'VALIDATION', 'HTTP_400', 'HTTP_401',
+                    'HTTP_403', 'HTTP_404', 'HTTP_429', 'HTTP_500', 'HTTP_503', 'HTTP_OTHER',
+                    'RESPONSE_SIZE', 'MENU_NAME', 'DAYS', 'NUMBER', 'NOTE', 'CACHE', 'KEY_MISSING'}
 
 
 def main():
@@ -75,6 +79,11 @@ def main():
                 or summary['previous_status'] not in PREVIOUS_STATUSES):
             raise ValueError('SUMMARY_INVALID')
         public['previous_status'] = summary['previous_status']
+    if 'nutrition_error' in summary:
+        if (not isinstance(summary['nutrition_error'], str)
+                or summary['nutrition_error'] not in NUTRITION_ERRORS):
+            raise ValueError('SUMMARY_INVALID')
+        public['nutrition_error'] = summary['nutrition_error']
     print(json.dumps(public, ensure_ascii=False, sort_keys=True))
     failed = summary['status'] in {'failed', 'smtp_rejected', 'uncertain', 'failed_before_data'}
     if summary['status'] == 'already_attempted':
