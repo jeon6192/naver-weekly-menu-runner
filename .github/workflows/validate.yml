@@ -1,0 +1,70 @@
+name: 주간 식단 검증
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: weekly-menu-validation
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      PYTHONUTF8: '1'
+      PYTHONDONTWRITEBYTECODE: '1'
+      SOURCE_SHA: ${{ vars.SOURCE_SHA }}
+    steps:
+      - name: 실행 대상 준비 확인
+        env:
+          SOURCE_REPOSITORY: ${{ vars.SOURCE_REPOSITORY }}
+          SOURCE_READ_TOKEN: ${{ secrets.SOURCE_READ_TOKEN }}
+        run: |
+          if [[ ! "$SOURCE_SHA" =~ ^[a-fA-F0-9]{40}$ ]] || [ "$SOURCE_REPOSITORY" != 'jeon6192/naver-blog-bot' ] || [ -z "$SOURCE_READ_TOKEN" ]; then
+            echo 'CONFIG_NOT_READY'
+            exit 1
+          fi
+
+      - name: 공개 실행 도구 받기
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+          path: launcher
+
+      - name: 검증한 비공개 본체 받기
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          repository: ${{ vars.SOURCE_REPOSITORY }}
+          ref: ${{ vars.SOURCE_SHA }}
+          token: ${{ secrets.SOURCE_READ_TOKEN }}
+          persist-credentials: false
+          fetch-depth: 1
+          path: source
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /weekly_menu/
+            /tests/
+            /tools/
+            /examples/weekly-menu-2026-10-05/
+            /requirements-weekly-menu.txt
+
+      - name: Python 준비
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: '3.13'
+
+      - name: 작업 컴퓨터의 의존성과 Chromium 준비
+        working-directory: source
+        run: |
+          python -m pip install -r requirements-weekly-menu.txt
+          python -m playwright install --with-deps chromium
+
+      - name: 기존 테스트와 공개 샘플 확인
+        run: python launcher/validate.py --source source
+
+# source·메일·DB·원시 오류를 공개 artifact로 업로드하지 않는다.

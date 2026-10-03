@@ -1,0 +1,110 @@
+name: 주간 식단 처리
+
+on:
+  workflow_dispatch:
+    inputs:
+      send:
+        description: 영구 기록 후 본인에게 발송
+        type: boolean
+        default: false
+        required: true
+  # 예약은 비활성이다. 실제 운영 승인·수신 검수 후에만 아래 두 줄의 주석을 해제한다.
+  # schedule:
+  #   - cron: '17 3,9,23 * * *'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: weekly-menu-operation
+  cancel-in-progress: false
+
+jobs:
+  operate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      PYTHONUTF8: '1'
+      PYTHONDONTWRITEBYTECODE: '1'
+      SOURCE_SHA: ${{ vars.SOURCE_SHA }}
+    steps:
+      - name: 실행 범위 준비 확인
+        env:
+          SOURCE_REPOSITORY: ${{ vars.SOURCE_REPOSITORY }}
+          SOURCE_READ_TOKEN: ${{ secrets.SOURCE_READ_TOKEN }}
+          SEND_REQUESTED: ${{ github.event_name == 'schedule' || inputs.send }}
+          ENABLE_DELIVERY: ${{ vars.ENABLE_DELIVERY }}
+          GEMINI_FREE_TIER_CONFIRMED: ${{ vars.GEMINI_FREE_TIER_CONFIRMED }}
+          WEEKLY_MENU_HISTORY_RECONCILED: ${{ vars.WEEKLY_MENU_HISTORY_RECONCILED }}
+        run: |
+          if [[ ! "$SOURCE_SHA" =~ ^[a-fA-F0-9]{40}$ ]] || [ "$SOURCE_REPOSITORY" != 'jeon6192/naver-blog-bot' ] || [ -z "$SOURCE_READ_TOKEN" ]; then
+            echo 'CONFIG_NOT_READY'
+            exit 1
+          fi
+          if [ "$GEMINI_FREE_TIER_CONFIRMED" != 'true' ]; then
+            echo 'OPERATIONS_NOT_READY'
+            exit 1
+          fi
+          if [ "$SEND_REQUESTED" = 'true' ] && { [ "$ENABLE_DELIVERY" != 'true' ] || [ "$WEEKLY_MENU_HISTORY_RECONCILED" != 'true' ]; }; then
+            echo 'DELIVERY_NOT_ENABLED'
+            exit 1
+          fi
+
+      - name: 공개 실행 도구 받기
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+          path: launcher
+
+      - name: 검증한 비공개 본체 받기
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          repository: ${{ vars.SOURCE_REPOSITORY }}
+          ref: ${{ vars.SOURCE_SHA }}
+          token: ${{ secrets.SOURCE_READ_TOKEN }}
+          persist-credentials: false
+          fetch-depth: 1
+          path: source
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /weekly_menu/
+            /tests/
+            /tools/
+            /examples/weekly-menu-2026-10-05/
+            /requirements-weekly-menu.txt
+
+      - name: Python 준비
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: '3.13'
+
+      - name: 작업 컴퓨터의 의존성과 Chromium 준비
+        working-directory: source
+        run: |
+          python -m pip install -r requirements-weekly-menu.txt
+          python -m playwright install --with-deps chromium
+
+      - name: 발송 인증 없이 기존 테스트 확인
+        run: python launcher/validate.py --source source
+
+      - name: 주간 식단 처리
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          SMTP_PASSWORD: ${{ (github.event_name == 'schedule' || inputs.send) && secrets.SMTP_PASSWORD || '' }}
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_SENDER: ${{ secrets.SMTP_SENDER }}
+          GEMINI_FREE_TIER_CONFIRMED: ${{ vars.GEMINI_FREE_TIER_CONFIRMED }}
+          WEEKLY_MENU_HISTORY_RECONCILED: ${{ vars.WEEKLY_MENU_HISTORY_RECONCILED }}
+          SEND_REQUESTED: ${{ github.event_name == 'schedule' || inputs.send }}
+          ENABLE_DELIVERY: ${{ vars.ENABLE_DELIVERY }}
+        run: |
+          if [ "$SEND_REQUESTED" = 'true' ] && [ "$ENABLE_DELIVERY" = 'true' ]; then
+            python launcher/run.py --source source --send
+          else
+            python launcher/run.py --source source
+          fi
+
+# 원문·메일·DB·비공개 소스·원시 출력을 공개 artifact로 올리지 않는다.
