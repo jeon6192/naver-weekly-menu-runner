@@ -25,6 +25,7 @@ def main():
     parser.add_argument('--source', type=Path, required=True)
     parser.add_argument('--send', action='store_true')
     parser.add_argument('--design-comparison', action='store_true')
+    parser.add_argument('--design-final', action='store_true')
     args = parser.parse_args()
     source = args.source.resolve()
     expected = os.environ.get('SOURCE_SHA', '')
@@ -53,6 +54,8 @@ def main():
         command.append('--send')
     if args.design_comparison:
         command.append('--design-comparison')
+    if args.design_final:
+        command.append('--design-final')
     result = subprocess.run(command, cwd=source, env=environment,
                             capture_output=True, text=True, encoding='utf-8',
                             errors='replace', timeout=600)
