@@ -23,6 +23,11 @@ on:
         type: boolean
         default: false
         required: true
+      design_styled:
+        description: 요청한 글꼴·색상 개선본 1회
+        type: boolean
+        default: false
+        required: true
   schedule:
     # 한국 시각 08:17, 12:17, 18:17. 같은 주 발송 기록이 있으면 재발송하지 않는다.
     - cron: '17 3,9,23 * * *'
@@ -115,6 +120,7 @@ jobs:
           DESIGN_COMPARISON: ${{ github.event_name == 'workflow_dispatch' && inputs.design_comparison }}
           DESIGN_FINAL: ${{ github.event_name == 'workflow_dispatch' && inputs.design_final }}
           DESIGN_MOBILE: ${{ github.event_name == 'workflow_dispatch' && inputs.design_mobile }}
+          DESIGN_STYLED: ${{ github.event_name == 'workflow_dispatch' && inputs.design_styled }}
         run: |
           flags=()
           if [ "$SEND_REQUESTED" = 'true' ] && [ "$ENABLE_DELIVERY" = 'true' ]; then
@@ -128,6 +134,9 @@ jobs:
           fi
           if [ "$DESIGN_MOBILE" = 'true' ]; then
             flags+=(--design-mobile)
+          fi
+          if [ "$DESIGN_STYLED" = 'true' ]; then
+            flags+=(--design-styled)
           fi
           python launcher/run.py --source source "${flags[@]}"
 
