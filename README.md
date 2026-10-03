@@ -2,9 +2,11 @@
 
 집 PC가 꺼져 있어도 비공개 식단 프로그램을 GitHub의 표준 Ubuntu runner에서 실행하는 설정이다. 이 디렉터리의 파일만 별도 공개 저장소의 루트에 복사한다. 본체 소스·과거 Git 이력·SQL·인증·메일·발송 DB는 공개 저장소에 복사하지 않는다.
 
-2026-10-04에 실제 준비·게시·발송·예약 실행을 허용받았고 [공개 실행 저장소](https://github.com/jeon6192/naver-weekly-menu-runner)를 생성했다. 아직 실행 파일 push·dispatch·예약·실제 발송은 하지 않았다. Windows 로컬 의존성·Chromium 설치, 기존 테스트 65개 통과·5개 생략·하위 검증 63개 통과, YAML 2개 파싱, 공개 샘플 34개 메뉴·136개 영양값·원문 캡처 재생성을 확인했다. 이 결과는 GitHub의 실제 실행 성공을 의미하지 않는다.
+2026-10-04에 실제 준비·게시·발송·예약 실행을 허용받았고 [공개 실행 저장소](https://github.com/jeon6192/naver-weekly-menu-runner)에 launcher 5개 파일만 독립 이력으로 게시했다. 최초 공개 SHA는 `77a9204909b2d3af94dde7888534181123615f91`, 확인한 기본 브랜치는 `codex/weekly-menu-runner`다. 본체 작업 브랜치의 검증 SHA는 `cbecab4c2279ea28c744db6e946938fab39d8ce4`이며 커밋·push와 해당 SHA의 로컬 launcher 검증을 완료했다. Variables 5개와 URL Secret 등록을 완료했으며 나머지 인증 연결·dispatch·예약·실제 발송은 아직 남아 있다. Windows 로컬 의존성·Chromium 설치, 기존 테스트 65개 통과·5개 생략·하위 검증 63개 통과, YAML 2개 파싱, 공개 샘플 34개 메뉴·136개 영양값·원문 캡처 재생성을 확인했다. 이 결과는 GitHub의 실제 실행 성공을 의미하지 않는다.
 
-신규 통합 14개·HTTP 경계 82개는 오프라인으로 통과했다. Supabase 로그인·Free 조직·`naver-weekly-menu-state` 프로젝트 생성을 완료했고 실제 UI의 Free·Seoul·Healthy 상태를 확인했다. DB 비밀번호 입력·프로젝트 생성 제출은 브라우저의 인증정보 변경 규칙에 따라 사용자가 직접 완료했다. 원격 SQL 적용·실제 모델 API·SMTP·클라우드 실행은 아직 하지 않았다. 프로젝트 ID·URL·인증 값은 공개 문서에 넣지 않는다.
+신규 통합 14개·HTTP 경계 82개는 오프라인으로 통과했다. Supabase Free·Seoul·Healthy 프로젝트의 SQL 적용 후 카탈로그 표 3개·RLS 3개·보호 트리거 2개, 익명·일반 사용자 표/함수 권한 0개, 서비스 역할 최소 표 권한 3개와 전체 계약 일치를 확인했다. 합성 행을 이용한 9개 검증으로 순차 고유 시도·최종 상태·분석 불변·금지 수정/삭제·최초 관측 시각 보존을 확인하고 명시적으로 ROLLBACK했다. 실제 운영 행은 조회·변경하지 않았다. 동시 세션과 REST 인증은 미검증이다.
+
+공개 저장소 Variables 5개와 `SUPABASE_URL` Secret을 등록했다. `ENABLE_DELIVERY`·`WEEKLY_MENU_HISTORY_RECONCILED`·`GEMINI_FREE_TIER_CONFIRMED`는 모두 `false`다. 나머지 `SOURCE_READ_TOKEN`·`SUPABASE_SERVICE_ROLE_KEY`·`GEMINI_API_KEY`·`SMTP_PASSWORD` 설정은 브라우저의 새 접근 권한·인증 규칙에 따라 사용자 직접 처리 요청 중이다. 해당 Gemini 프로젝트가 Free이며 v2 인계 이후 추가 시도가 없다는 확인도 요청했다. 실제 모델 API·SMTP·클라우드 CI는 0건이고 예약은 꺼져 있다. 프로젝트 ID·URL·인증 값은 공개 문서에 넣지 않는다.
 
 ## 실행 범위
 
@@ -28,16 +30,16 @@
 | Secrets | `SMTP_USER`, `SMTP_SENDER` | 로그인과 발신 주소다. Variables에 두면 단계의 env 로그에 공개될 수 있어 Secrets로 등록한다 |
 | Variables | `GEMINI_FREE_TIER_CONFIRMED` | 해당 키의 프로젝트가 무료 등급임을 직접 확인한 뒤 `true`로 설정한다 |
 | Variables | `WEEKLY_MENU_HISTORY_RECONCILED` | 기존 PC별 시도 기록과 원격 상태를 대조·보존한 뒤 `true`로 설정한다. 새 DB가 비어 있다는 이유로 완료 처리하지 않는다 |
-| Variables | `ENABLE_DELIVERY` | 기본은 미설정 또는 `false`다. 실제 수신 검수·발송 허용 범위 확인 후에만 `true`로 설정한다 |
+| Variables | `ENABLE_DELIVERY` | 기본은 미설정 또는 `false`다. 미발송 검증·기존 시도 대조·인증 준비 후 첫 1회 발송 전에 `true`로 설정한다. 실제 수신 검수 후 예약을 활성화한다 |
 
-`SOURCE_SHA`가 바뀌면 검증부터 다시 수행한다. 본체 기본 브랜치에 병합할 필요는 없지만 원격에 해당 SHA가 있어야 checkout할 수 있다. 작업 브랜치 push는 허용받았으며 검토·커밋 후 진행한다. 워크플로와 wrapper는 모두 같은 `SOURCE_SHA`를 확인한다.
+`SOURCE_SHA`가 바뀌면 검증부터 다시 수행한다. 본체 기본 브랜치에 병합할 필요는 없지만 원격에 해당 SHA가 있어야 checkout할 수 있다. 검증한 본체 SHA는 이미 작업 브랜치에 게시돼 있다. 워크플로와 wrapper는 모두 같은 `SOURCE_SHA`를 확인한다.
 
 Supabase는 전용 프로젝트에 비공개 본체의 `weekly_menu/sql/` SQL을 적용해야 한다. 익명·일반 사용자에게 기록 테이블을 공개하지 않는다. 기록 준비 검사 실패, 네트워크 오류, 원자적 발송 기록 실패 시 SMTP를 시작하지 않는다. 서비스 키는 서버 작업 전용이며 높은 권한을 가지므로 다른 앱의 데이터를 함께 넣지 않는다.
 
 ## 준비와 확인 순서
 
 1. 본체의 신규 코드·검증 결과를 확인한다. 실제 실행은 허용받았으며 운영자 계정의 GitHub 공개 표준 runner 사용 가능 여부와 Gemini 무료 프로젝트 여부를 확인한다.
-2. 생성한 별도 공개 저장소에 이 디렉터리의 파일만 게시하고 설정을 등록한다. 게시 전 파일 목록·diff·비밀값 포함 여부를 확인한다. 기존 저장소의 공개 전환은 하지 않는다.
+2. 별도 공개 저장소에는 이 디렉터리의 파일만 게시했고 남은 인증·설정을 등록한다. 후속 게시 전에도 파일 목록·diff·비밀값 포함 여부를 확인한다. 기존 저장소의 공개 전환은 하지 않는다.
 3. Actions → 주간 식단 검증 → Run workflow로 고정 SHA의 기존 테스트와 공개 샘플을 확인한다. 단계 실패 시 다음으로 넘어가지 않는다. 테스트 통과 개수와 34개 메뉴·136개 영양값·원문 PNG가 로그에 표시돼야 한다.
 4. 원격 기록 SQL을 적용하고, Actions → 주간 식단 처리에서 `send=false`로 실행한다. `prepared` 상태·메뉴 개수·영양값 개수를 확인한다. 발송 전에는 기존 시도 기록 대조도 완료해야 한다. 미리보기와 개인 산출물은 공개 artifact로 업로드하지 않는다. 받은메일 검수와 별도로 비공개 환경에서 확인한다.
 5. 실제 발송 승인 이후에만 `ENABLE_DELIVERY=true`와 `send=true`로 한 번 실행한다. SMTP 수락 뒤 본인의 받은메일과 모바일 화면에서 전체 메뉴·영양·원문 캡처를 확인한다. 발송 기록을 삭제하거나 다른 라벨로 바꿔 재시도하지 않는다.
