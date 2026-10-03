@@ -8,9 +8,9 @@ on:
         type: boolean
         default: false
         required: true
-  # 예약은 비활성이다. 실제 운영 승인·수신 검수 후에만 아래 두 줄의 주석을 해제한다.
-  # schedule:
-  #   - cron: '17 3,9,23 * * *'
+  schedule:
+    # 한국 시각 08:17, 12:17, 18:17. 같은 주 발송 기록이 있으면 재발송하지 않는다.
+    - cron: '17 3,9,23 * * *'
 
 permissions:
   contents: read
