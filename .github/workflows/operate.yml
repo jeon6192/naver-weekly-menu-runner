@@ -8,6 +8,11 @@ on:
         type: boolean
         default: false
         required: true
+      design_comparison:
+        description: 요청한 디자인 비교 B 1회
+        type: boolean
+        default: false
+        required: true
   schedule:
     # 한국 시각 08:17, 12:17, 18:17. 같은 주 발송 기록이 있으면 재발송하지 않는다.
     - cron: '17 3,9,23 * * *'
@@ -97,11 +102,15 @@ jobs:
           WEEKLY_MENU_HISTORY_RECONCILED: ${{ vars.WEEKLY_MENU_HISTORY_RECONCILED }}
           SEND_REQUESTED: ${{ github.event_name == 'schedule' || inputs.send }}
           ENABLE_DELIVERY: ${{ vars.ENABLE_DELIVERY }}
+          DESIGN_COMPARISON: ${{ github.event_name == 'workflow_dispatch' && inputs.design_comparison }}
         run: |
+          flags=()
           if [ "$SEND_REQUESTED" = 'true' ] && [ "$ENABLE_DELIVERY" = 'true' ]; then
-            python launcher/run.py --source source --send
-          else
-            python launcher/run.py --source source
+            flags+=(--send)
           fi
+          if [ "$DESIGN_COMPARISON" = 'true' ]; then
+            flags+=(--design-comparison)
+          fi
+          python launcher/run.py --source source "${flags[@]}"
 
 # 원문·메일·DB·비공개 소스·원시 출력을 공개 artifact로 올리지 않는다.
