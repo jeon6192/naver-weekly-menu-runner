@@ -72,7 +72,7 @@ def main():
             or summary['status'] not in STATUSES):
         raise ValueError('SUMMARY_INVALID')
     public = {'status': summary['status']}
-    for name in ('menu_count', 'nutrient_count'):
+    for name in ('menu_count', 'nutrient_count', 'recipient_count'):
         if name in summary:
             if type(summary[name]) is not int or not 0 <= summary[name] <= 2000:
                 raise ValueError('SUMMARY_INVALID')

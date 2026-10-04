@@ -29,8 +29,8 @@ on:
         default: false
         required: true
   schedule:
-    # 한국 시각 08:17, 12:17, 18:17. 같은 주 발송 기록이 있으면 재발송하지 않는다.
-    - cron: '17 3,9,23 * * *'
+    # 관측한 주간 게시 4개 중 3개가 오후 15시 전후다. 한국 시각 08:17, 12:17, 16:17에 확인한다.
+    - cron: '17 3,7,23 * * *'
 
 permissions:
   contents: read
@@ -113,6 +113,7 @@ jobs:
           SMTP_PASSWORD: ${{ (github.event_name == 'schedule' || inputs.send) && secrets.SMTP_PASSWORD || '' }}
           SMTP_USER: ${{ secrets.SMTP_USER }}
           SMTP_SENDER: ${{ secrets.SMTP_SENDER }}
+          WEEKLY_MENU_RECIPIENTS: ${{ secrets.WEEKLY_MENU_RECIPIENTS }}
           GEMINI_FREE_TIER_CONFIRMED: ${{ vars.GEMINI_FREE_TIER_CONFIRMED }}
           WEEKLY_MENU_HISTORY_RECONCILED: ${{ vars.WEEKLY_MENU_HISTORY_RECONCILED }}
           SEND_REQUESTED: ${{ github.event_name == 'schedule' || inputs.send }}
