@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       send:
-        description: 영구 기록 후 본인에게 발송
+        description: 운영 수신자에게 발송 (디자인 확인 옵션은 본인 1명)
         type: boolean
         default: false
         required: true
