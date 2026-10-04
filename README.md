@@ -11,6 +11,8 @@
 - [마지막 본인 확인](https://github.com/jeon6192/naver-weekly-menu-runner/actions/runs/37177491392)은 2026-10-04 13:37 KST에 성공했다. 수신자 1명·메뉴 34개·영양값 136개이며 사용자가 실제 수신을 확인한다.
 - [이전 예약 실행](https://github.com/jeon6192/naver-weekly-menu-runner/actions/runs/37171925891)은 성공했다. 새 4명 운영 예약의 첫 전달은 아직 미관측이다.
 
+- [운영 4명 준비 실행](https://github.com/jeon6192/naver-weekly-menu-runner/actions/runs/37177794660)은 13:43 KST에 `prepared`로 성공했다. 수신자 4명·메뉴 34개·영양값 136개·발송 OFF를 확인했고 추가 메일은 보내지 않았다.
+
 ## 예약 근거
 
 [공개 RSS](https://rss.blog.naver.com/cbob0803.xml)에서 일일 10개를 제외한 주간 4개를 실제 원문 표까지 확인했다. 게시 KST는 2026-09-14 월 10:53, 09-17 목 15:10, 09-22 화 15:09, 10-02 금 14:43이다. 요일은 불규칙하고 4개 중 3개가 오후여서 매일 오전·정오·오후에 확인한다. 확정된 게시 규칙으로 보지 않는다. UTC 예약은 `17 3,7,23 * * *`이며 GitHub 상황에 따라 지연될 수 있다.
