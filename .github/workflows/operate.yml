@@ -29,8 +29,9 @@ on:
         default: false
         required: true
   schedule:
-    # 관측한 주간 게시 4개 중 3개가 오후 15시 전후다. 한국 시각 08:17, 12:17, 16:17에 확인한다.
-    - cron: '17 3,7,23 * * *'
+    # 한국 시각 매일 16:17, 월요일 11:17 추가. 오후 주간 게시와 월요일 당일 게시에 대응한다.
+    - cron: '17 7 * * *'
+    - cron: '17 2 * * 1'
 
 permissions:
   contents: read
