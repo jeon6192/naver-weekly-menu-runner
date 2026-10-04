@@ -8,13 +8,19 @@
 | --- | --- |
 | Codex | `AGENTS.md` 직접 읽기 |
 | Claude Code | `CLAUDE.md`의 `@AGENTS.md` 가져오기 |
-| Gemini CLI | `GEMINI.md`의 `@./AGENTS.md` 가져오기 |
+| Gemini CLI | `GEMINI.md`의 `@./AGENTS.md` 가져오기, 자동 확장이 없으면 AGENTS 직접 읽기 |
 | Kimi Code | `AGENTS.md` 직접 읽기 |
 | Qwen Code | `QWEN.md`의 `@AGENTS.md` 가져오기, AGENTS 직접 읽기도 지원 |
-| agy 대화형 | 프로젝트 `AGENTS.md`와 `GEMINI.md`를 읽는 경로 |
+| agy 대화형 | agents-config의 2026-08-10 실측은 AGENTS·GEMINI 직접 읽기, 이번 환경의 실제 적재는 미실측 |
 | agy 비대화형 `-p` | 규칙 본문을 프롬프트에 주입하는 래퍼 또는 명시적 주입 필요 |
 
 파일 기반 지침을 지원하지 않는 다른 AI에는 프로젝트 `AGENTS.md`의 내용을 첫 지시로 전달한다. 저장소를 읽을 수 있는 AI에는 해당 파일을 먼저 읽게 한다. AI 이름만 바꿨다고 지침 적재가 자동 보장되는 것은 아니다.
+
+## 링크와 가져오기 구문은 다르다
+
+일반 Markdown 링크는 참고 경로이며 내용의 자동 주입을 보장하지 않는다. Claude Code·Gemini CLI·Qwen Code의 `@파일`은 각각 지원하는 가져오기 구문이다. Codex·Kimi에는 `@import` 자동 확장을 전제로 연결하지 않고 공통 AGENTS 본문을 직접 제공한다.
+
+Gemini CLI와 agy를 같은 적재 방식으로 취급하지 않는다. Gemini CLI의 공식 가져오기 기능과 달리 agents-config의 agy `-p` 실측은 파일을 읽지 않았다. `GEMINI.md`의 직접 읽기 지시는 그 파일을 읽는 환경에 대한 보완이며, 파일 자체를 읽지 않는 agy `-p`를 해결하지는 않는다. 이 경우 래퍼 또는 명시적인 본문 주입이 필요하다.
 
 ## 시작과 확인
 
