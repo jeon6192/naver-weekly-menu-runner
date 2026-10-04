@@ -47,6 +47,10 @@
 
 `ENABLE_DELIVERY=false`와 workflow 비활성화로 중단한다. 이미 제출한 메일은 취소할 수 없다. 기존 기록을 삭제하거나 라벨·새 DB로 바꿔 재발송하지 않는다. Supabase 상태 표는 비공개로 백업하고 복구 시 전체 시도를 대조하기 전 발송을 켜지 않는다. 무료 프로젝트 휴면과 인증 만료도 기록을 초기화하는 방식으로 복구하지 않는다.
 
-공개에는 이 디렉터리의 5개 파일만 복사한다. 프리뷰·EML·원문·SQL·기록 DB·비공개 소스·과거 Git 이력을 artifact나 로그에 올리지 않는다. 필요한 변경에만 수동 검증을 실행하며 운영마다 전체 테스트를 반복하지 않는다.
+공개에는 이 디렉터리의 실행 설정·운영 안내·공통 AI 지침과 진입 파일만 복사한다. 프리뷰·EML·원문·SQL·기록 DB·비공개 소스·과거 Git 이력을 artifact나 로그에 올리지 않는다. 필요한 변경에만 수동 검증을 실행하며 운영마다 전체 테스트를 반복하지 않는다.
 
 [GitHub 실행 서버](https://docs.github.com/en/actions/reference/runners/github-hosted-runners) · [예약 이벤트](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule) · [Gemini 무료 요금](https://ai.google.dev/gemini-api/docs/pricing)
+
+## AI 작업 지침
+
+이 저장소의 공통 정본은 [AGENTS.md](AGENTS.md)다. Codex·Claude Code·Gemini CLI/agy·Kimi Code·Qwen Code의 진입점을 연결했다. [AI 설정 안내](.agents/README.md)에 새 세션과 실제 적재 확인 절차가 있다. 비공개 본체 지침·개인 주소·인증은 공개 지침에 복제하지 않는다.
