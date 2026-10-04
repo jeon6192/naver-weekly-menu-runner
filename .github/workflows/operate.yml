@@ -95,6 +95,18 @@ jobs:
             /examples/weekly-menu-2026-10-05/
             /requirements-weekly-menu.txt
 
+      - name: 최신 비공개 수신자 목록 받기
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          repository: ${{ vars.SOURCE_REPOSITORY }}
+          ref: codex/weekly-menu-v1
+          token: ${{ secrets.SOURCE_READ_TOKEN }}
+          persist-credentials: false
+          fetch-depth: 1
+          path: recipient-config
+          sparse-checkout-cone-mode: false
+          sparse-checkout: /weekly_menu/recipients.txt
+
       - name: Python 준비
         uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
         with:
@@ -114,7 +126,6 @@ jobs:
           SMTP_PASSWORD: ${{ (github.event_name == 'schedule' || inputs.send) && secrets.SMTP_PASSWORD || '' }}
           SMTP_USER: ${{ secrets.SMTP_USER }}
           SMTP_SENDER: ${{ secrets.SMTP_SENDER }}
-          WEEKLY_MENU_RECIPIENTS: ${{ secrets.WEEKLY_MENU_RECIPIENTS }}
           GEMINI_FREE_TIER_CONFIRMED: ${{ vars.GEMINI_FREE_TIER_CONFIRMED }}
           WEEKLY_MENU_HISTORY_RECONCILED: ${{ vars.WEEKLY_MENU_HISTORY_RECONCILED }}
           SEND_REQUESTED: ${{ github.event_name == 'schedule' || inputs.send }}
@@ -140,6 +151,6 @@ jobs:
           if [ "$DESIGN_STYLED" = 'true' ]; then
             flags+=(--design-styled)
           fi
-          python launcher/run.py --source source "${flags[@]}"
+          python launcher/run.py --source source --recipients-file recipient-config/weekly_menu/recipients.txt "${flags[@]}"
 
 # 원문·메일·DB·비공개 소스·원시 출력을 공개 artifact로 올리지 않는다.

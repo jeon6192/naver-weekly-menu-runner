@@ -23,6 +23,7 @@ NUTRITION_ERRORS = {'NETWORK', 'INCOMPLETE', 'JSON', 'REPEATED_MENU', 'MENU_COVE
 def main():
     parser = argparse.ArgumentParser(description='공개 로그에는 상태와 개수만 남긴다.')
     parser.add_argument('--source', type=Path, required=True)
+    parser.add_argument('--recipients-file', type=Path)
     parser.add_argument('--send', action='store_true')
     parser.add_argument('--design-comparison', action='store_true')
     parser.add_argument('--design-final', action='store_true')
@@ -34,6 +35,12 @@ def main():
     if re.fullmatch(r'[a-fA-F0-9]{40}', expected) is None:
         raise ValueError('SOURCE_VERSION')
     environment = os.environ.copy()
+    if args.recipients_file:
+        addresses = [line.strip() for line in args.recipients_file.read_text(encoding='utf-8-sig').splitlines()
+                     if line.strip() and not line.strip().startswith('#')]
+        if not addresses:
+            raise ValueError('RECIPIENTS_NOT_READY')
+        environment['WEEKLY_MENU_RECIPIENTS'] = ','.join(addresses)
     # 읽기 토큰은 본체 다운로드에만 필요하다.
     for name in ('SOURCE_READ_TOKEN', 'GH_TOKEN', 'GITHUB_TOKEN', 'WEEKLY_MENU_LIVE_TEST'):
         environment.pop(name, None)

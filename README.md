@@ -6,7 +6,7 @@
 
 - 본체는 비공개 `jeon6192/naver-blog-bot`의 `c1af6be55a387eb9b4e21aa23cf50a4d7ebfbc0f`를 사용한다.
 - 실제 블로그 `cbob0803`의 주간 글만 처리하며 메뉴별 가상 1회분 영양을 Free Gemini로 추정한다.
-- 기존 운영 수신자 4명의 주소는 `WEEKLY_MENU_RECIPIENTS` Secret에 보관한다. 공개 로그에는 개수만 표시한다.
+- 기존 운영 수신자 4명의 주소는 비공개 본체의 `weekly_menu/recipients.txt`에 보관한다. 매번 최신 목록만 읽으며 공개 로그에는 개수만 표시한다.
 - 한국 시각 매일 16:17과 월요일 11:17에 확인하고, 같은 주 운영 메일은 1회만 보낸다.
 - [마지막 본인 확인](https://github.com/jeon6192/naver-weekly-menu-runner/actions/runs/37177491392)은 2026-10-04 13:37 KST에 성공했다. 수신자 1명·메뉴 34개·영양값 136개이며 사용자가 실제 수신을 확인한다.
 - [이전 예약 실행](https://github.com/jeon6192/naver-weekly-menu-runner/actions/runs/37171925891)은 성공했다. 새 4명 운영 예약의 첫 전달은 아직 미관측이다.
@@ -17,6 +17,12 @@
 
 [공개 RSS](https://rss.blog.naver.com/cbob0803.xml)에서 일일 10개를 제외한 주간 4개를 실제 원문 표까지 확인했다. 게시 KST는 2026-09-14 월 10:53, 09-17 목 15:10, 09-22 화 15:09, 10-02 금 14:43이다. 요일은 불규칙하므로 주말도 포함해 매일 16:17에 확인한다. 월요일 10:53 당일 게시 사례에 대응해 월요일 11:17을 추가한다. 주 21회에서 8회로 약 62% 줄였으며 실제 메일은 같은 주 식단당 1회다. 16:17 이후 게시하면 다음 날까지 대기할 수 있다. 관측은 4개뿐이라 고정 패턴으로 확정하지 않는다. UTC 예약은 매일 `17 7 * * *`와 월요일 `17 2 * * 1`이며 GitHub 상황에 따라 지연될 수 있다.
 
+## 수신자 추가·삭제
+
+[비공개 수신자 목록](https://github.com/jeon6192/naver-blog-bot/blob/codex/weekly-menu-v1/weekly_menu/recipients.txt)을 연다. 연필(Edit this file) → 한 줄에 주소 하나를 추가하거나 해당 줄 삭제 → Commit changes로 `codex/weekly-menu-v1`에 저장한다. 빈 줄과 `#` 설명 줄은 무시한다. 주소 목록은 공개 저장소에 복사하지 않는다.
+
+프로그램 배포·`SOURCE_SHA` 변경·Secret 재등록 없이 다음 예약에서 최신 목록을 읽는다. 이미 그 주 메일을 보냈으면 추가한 수신자는 다음 새 주간 식단부터 받는다. 같은 주를 새 목록으로 재발송하지 않는다. 목록이 비었거나 형식이 잘못되면 발송을 중단하며 기존 Secret으로 되돌려 보내지 않는다.
+
 ## 필요한 설정
 
 | 위치 | 이름 | 용도 |
@@ -25,7 +31,6 @@
 | Secrets | `GEMINI_API_KEY` | 확인된 무료 프로젝트 키 |
 | Secrets | `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` | 비공개 발송 기록 서버 설정 |
 | Secrets | `SMTP_PASSWORD` | NAVER WORKS 외부 앱 비밀번호 |
-| Secrets | `WEEKLY_MENU_RECIPIENTS` | 기존 운영 수신자 목록, 쉼표로 구분 |
 | Secrets | `SMTP_USER`, `SMTP_SENDER` | 필요할 때 로그인·발신 주소 지정 |
 | Variables | `SOURCE_REPOSITORY`, `SOURCE_SHA` | 본체 저장소와 검토된 40자리 버전 |
 | Variables | `GEMINI_FREE_TIER_CONFIRMED` | 해당 키의 무료 프로젝트 확인 후 `true` |
