@@ -4,27 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       send:
-        description: 운영 수신자에게 발송 (디자인 확인 옵션은 본인 1명)
-        type: boolean
-        default: false
-        required: true
-      design_comparison:
-        description: 요청한 디자인 비교 B 1회
-        type: boolean
-        default: false
-        required: true
-      design_final:
-        description: 요청한 최종 디자인 A 1회
-        type: boolean
-        default: false
-        required: true
-      design_mobile:
-        description: 요청한 모바일 수정본 1회
-        type: boolean
-        default: false
-        required: true
-      design_styled:
-        description: 요청한 글꼴·색상 개선본 1회
+        description: 운영 수신자에게 발송
         type: boolean
         default: false
         required: true
@@ -99,7 +79,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           repository: ${{ vars.SOURCE_REPOSITORY }}
-          ref: codex/weekly-menu-v1
+          ref: main
           token: ${{ secrets.SOURCE_READ_TOKEN }}
           persist-credentials: false
           fetch-depth: 1
@@ -130,26 +110,10 @@ jobs:
           WEEKLY_MENU_HISTORY_RECONCILED: ${{ vars.WEEKLY_MENU_HISTORY_RECONCILED }}
           SEND_REQUESTED: ${{ github.event_name == 'schedule' || inputs.send }}
           ENABLE_DELIVERY: ${{ vars.ENABLE_DELIVERY }}
-          DESIGN_COMPARISON: ${{ github.event_name == 'workflow_dispatch' && inputs.design_comparison }}
-          DESIGN_FINAL: ${{ github.event_name == 'workflow_dispatch' && inputs.design_final }}
-          DESIGN_MOBILE: ${{ github.event_name == 'workflow_dispatch' && inputs.design_mobile }}
-          DESIGN_STYLED: ${{ github.event_name == 'workflow_dispatch' && inputs.design_styled }}
         run: |
           flags=()
           if [ "$SEND_REQUESTED" = 'true' ] && [ "$ENABLE_DELIVERY" = 'true' ]; then
             flags+=(--send)
-          fi
-          if [ "$DESIGN_COMPARISON" = 'true' ]; then
-            flags+=(--design-comparison)
-          fi
-          if [ "$DESIGN_FINAL" = 'true' ]; then
-            flags+=(--design-final)
-          fi
-          if [ "$DESIGN_MOBILE" = 'true' ]; then
-            flags+=(--design-mobile)
-          fi
-          if [ "$DESIGN_STYLED" = 'true' ]; then
-            flags+=(--design-styled)
           fi
           python launcher/run.py --source source --recipients-file recipient-config/weekly_menu/recipients.txt "${flags[@]}"
 

@@ -4,7 +4,7 @@
 
 ## 현재 운영
 
-- 본체는 비공개 `jeon6192/naver-blog-bot`의 `c1af6be55a387eb9b4e21aa23cf50a4d7ebfbc0f`를 사용한다.
+- 본체는 비공개 `jeon6192/naver-blog-bot`의 `360e1a13e7c9c2db810b311a7c5d43d0d3e5b305`를 사용한다.
 - 실제 블로그 `cbob0803`의 주간 글만 처리하며 메뉴별 가상 1회분 영양을 Free Gemini로 추정한다.
 - 기존 운영 수신자 4명의 주소는 비공개 본체의 `weekly_menu/recipients.txt`에 보관한다. 매번 최신 목록만 읽으며 공개 로그에는 개수만 표시한다.
 - 한국 시각 매일 16:17과 월요일 11:17에 확인하고, 같은 주 운영 메일은 1회만 보낸다.
@@ -19,7 +19,7 @@
 
 ## 수신자 추가·삭제
 
-[비공개 수신자 목록](https://github.com/jeon6192/naver-blog-bot/blob/codex/weekly-menu-v1/weekly_menu/recipients.txt)을 연다. 연필(Edit this file) → 한 줄에 주소 하나를 추가하거나 해당 줄 삭제 → Commit changes로 `codex/weekly-menu-v1`에 저장한다. 빈 줄과 `#` 설명 줄은 무시한다. 주소 목록은 공개 저장소에 복사하지 않는다.
+[비공개 수신자 목록](https://github.com/jeon6192/naver-blog-bot/blob/main/weekly_menu/recipients.txt)을 연다. 연필(Edit this file) → 한 줄에 주소 하나를 추가하거나 해당 줄 삭제 → Commit changes로 `main`에 저장한다. 빈 줄과 `#` 설명 줄은 무시한다. 주소 목록은 공개 저장소에 복사하지 않는다.
 
 프로그램 배포·`SOURCE_SHA` 변경·Secret 재등록 없이 다음 예약에서 최신 목록을 읽는다. 이미 그 주 메일을 보냈으면 추가한 수신자는 다음 새 주간 식단부터 받는다. 같은 주를 새 목록으로 재발송하지 않는다. 목록이 비었거나 형식이 잘못되면 발송을 중단하며 기존 Secret으로 되돌려 보내지 않는다.
 
@@ -39,7 +39,7 @@
 
 ## 수동 실행과 결과
 
-GitHub Actions → 주간 식단 처리 → Run workflow에서 기본 실행은 발송하지 않는다. 운영 발송 체크만 켜면 지정된 운영 목록에 전달한다. 디자인 확인 옵션을 함께 선택하면 본인 1명에게만 보낸다. 이번 마지막 확인 목적 `styled-a-release-20261004`는 이미 성공했으며 같은 목적을 다시 보내지 않는다. 디자인 옵션은 한 종류만 선택한다.
+두 저장소의 기본 브랜치는 `main`이다. GitHub Actions → 주간 식단 처리 → Run workflow의 기본 실행은 발송하지 않는다. 운영 발송을 체크하면 지정된 운영 목록에 전달한다. 완료된 디자인 실험 옵션은 제거했고 이전 모든 발송 기록은 보존한다.
 
 `prepared`는 준비만 완료, `smtp_accepted`는 SMTP 수락, `already_attempted`는 같은 주의 시도 기록으로 발송 차단, `waiting_for_menu`는 검증된 현주/차주 식단이 아직 없는 상태다. 실제 받은메일 도착은 수신자가 확인한다. `failed_before_data`, `smtp_rejected`, `uncertain`은 기록을 보존하고 자동 재시도하지 않는다. 일부 수신자 거절도 같은 운영 건을 자동 재발송하지 않는다.
 

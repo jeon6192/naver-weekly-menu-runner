@@ -25,10 +25,6 @@ def main():
     parser.add_argument('--source', type=Path, required=True)
     parser.add_argument('--recipients-file', type=Path)
     parser.add_argument('--send', action='store_true')
-    parser.add_argument('--design-comparison', action='store_true')
-    parser.add_argument('--design-final', action='store_true')
-    parser.add_argument('--design-mobile', action='store_true')
-    parser.add_argument('--design-styled', action='store_true')
     args = parser.parse_args()
     source = args.source.resolve()
     expected = os.environ.get('SOURCE_SHA', '')
@@ -61,14 +57,6 @@ def main():
                '--summary', str(summary_path)]
     if args.send:
         command.append('--send')
-    if args.design_comparison:
-        command.append('--design-comparison')
-    if args.design_final:
-        command.append('--design-final')
-    if args.design_mobile:
-        command.append('--design-mobile')
-    if args.design_styled:
-        command.append('--design-styled')
     result = subprocess.run(command, cwd=source, env=environment,
                             capture_output=True, text=True, encoding='utf-8',
                             errors='replace', timeout=600)
