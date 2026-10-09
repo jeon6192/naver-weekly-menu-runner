@@ -9,7 +9,7 @@
 - 기존 운영 수신자 4명의 주소는 비공개 본체의 `weekly_menu/recipients.txt`에 보관한다. 매번 최신 목록만 읽으며 공개 로그에는 개수만 표시한다.
 - 한국 시각 매일 16:17과 월요일 11:17에 확인하고, 같은 주 운영 메일은 1회만 보낸다.
 - [마지막 본인 확인](https://github.com/jeon6192/naver-weekly-menu-runner/actions/runs/37177491392)은 2026-10-04 13:37 KST에 성공했다. 수신자 1명·메뉴 34개·영양값 136개이며 사용자가 실제 수신을 확인한다.
-- [이전 예약 실행](https://github.com/jeon6192/naver-weekly-menu-runner/actions/runs/37171925891)은 성공했다. 새 4명 운영 예약의 첫 전달은 아직 미관측이다.
+- [10월 12~16일 운영 발송](https://github.com/jeon6192/naver-weekly-menu-runner/actions/runs/37920789680)은 2026-10-09 19:58 KST에 기존 운영 수신자 4명·메뉴 62개·영양값 248개로 `smtp_accepted`에 성공했다. 실제 받은메일 도착은 별도 확인한다.
 
 - [운영 4명 준비 실행](https://github.com/jeon6192/naver-weekly-menu-runner/actions/runs/37177794660)은 13:43 KST에 `prepared`로 성공했다. 수신자 4명·메뉴 34개·영양값 136개·발송 OFF를 확인했고 추가 메일은 보내지 않았다.
 
