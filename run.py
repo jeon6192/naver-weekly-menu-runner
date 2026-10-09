@@ -18,6 +18,12 @@ NUTRITION_ERRORS = {'NETWORK', 'INCOMPLETE', 'JSON', 'REPEATED_MENU', 'MENU_COVE
                     'MENU_ORDER', 'ENERGY', 'VALIDATION', 'HTTP_400', 'HTTP_401',
                     'HTTP_403', 'HTTP_404', 'HTTP_429', 'HTTP_500', 'HTTP_503', 'HTTP_OTHER',
                     'RESPONSE_SIZE', 'MENU_NAME', 'DAYS', 'NUMBER', 'NOTE', 'CACHE', 'KEY_MISSING'}
+COLLECTION_ERRORS = {'VALIDATION', 'SOURCE_REQUEST', 'SOURCE_HTTP', 'SOURCE_DENIED',
+                     'RSS_XML', 'RSS_SOURCE', 'RSS_DATE', 'RSS_EMPTY', 'TABLE_BODY',
+                     'TABLE_MISSING', 'TABLE_HEADER', 'TABLE_AMBIGUOUS', 'TABLE_GRID',
+                     'TABLE_PERIOD', 'TABLE_ROW', 'TABLE_MEAL', 'TABLE_DAY',
+                     'INVALID_CANDIDATES', 'NEWER_CANDIDATE'}
+COLLECTION_STAGES = {'RSS', 'POST', 'SELECTION'}
 
 
 def main():
@@ -91,6 +97,12 @@ def main():
                 or summary['nutrition_error'] not in NUTRITION_ERRORS):
             raise ValueError('SUMMARY_INVALID')
         public['nutrition_error'] = summary['nutrition_error']
+    for name in ('collection_error', 'collection_cause', 'collection_stage'):
+        if name in summary:
+            allowed = COLLECTION_STAGES if name == 'collection_stage' else COLLECTION_ERRORS
+            if not isinstance(summary[name], str) or summary[name] not in allowed:
+                raise ValueError('SUMMARY_INVALID')
+            public[name] = summary[name]
     print(json.dumps(public, ensure_ascii=False, sort_keys=True))
     failed = summary['status'] in {'failed', 'smtp_rejected', 'uncertain', 'failed_before_data'}
     if summary['status'] == 'already_attempted':
